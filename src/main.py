@@ -3,7 +3,12 @@ import sys
 import gi
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.1')
+
+try:
+    gi.require_version('WebKit2', '4.0')
+except ValueError:
+    gi.require_version('WebKit2', '4.1')
+
 from gi.repository import Gtk, WebKit2
 
 class NarkBrowser(Gtk.Window):
@@ -12,7 +17,6 @@ class NarkBrowser(Gtk.Window):
         self.set_default_size(1024, 768)
         self.connect("destroy", Gtk.main_quit)
 
-        # 永続化データ（Cookie/キャッシュ/LocalStorage等）の保存ディレクトリ
         data_dir = os.path.expanduser("~/.local/share/Nark-Browser")
         os.makedirs(data_dir, exist_ok=True)
 
@@ -24,8 +28,7 @@ class NarkBrowser(Gtk.Window):
         )
 
         self.webview = WebKit2.WebView.new_with_context(context)
-
-        # 操作用UI（アドレスバー＋操作ボタン）
+        
         toolbar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         
         btn_back = Gtk.Button(label="←")
