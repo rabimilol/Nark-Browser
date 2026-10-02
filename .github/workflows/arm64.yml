@@ -1,0 +1,48 @@
+name: Build Nark-Browser (arm64)
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Fix line endings and permissions
+        run: |
+          sudo apt-get update && sudo apt-get install -y dos2unix
+          dos2unix build.sh src/main.py
+          chmod +x build.sh
+
+      - name: Build .deb inside Ubuntu arm64 Container
+        run: |
+          docker run --rm \
+            --platform linux/arm64 \
+            -v ${{ github.workspace }}:/work \
+            -w /work \
+            arm64v8/ubuntu:22.04 \
+            /bin/bash ./build.sh
+
+      - name: Generate APT Repository Index
+        run: |
+          sudo apt-get install -y dpkg-dev
+          mkdir -p public
+          cp dist_deb/*.deb public/
+          cd public
+          dpkg-scanpackages . /dev/null > Packages
+          gzip -k -f Packages
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
