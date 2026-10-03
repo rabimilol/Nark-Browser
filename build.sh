@@ -10,7 +10,6 @@ apt-get install -y \
     gir1.2-webkit2-4.1 \
     binutils
 
-pip3 install pyinstaller --break-system-packages
+pip3 install pyinstaller
 
-# Nark-Browser という単一バイナリを生成
 pyinstaller --onefile --hidden-import=gi --name=Nark-Browser src/main.py
