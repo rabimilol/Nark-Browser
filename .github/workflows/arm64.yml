@@ -18,7 +18,7 @@ jobs:
 
       - name: Convert line endings to LF
         run: |
-          sudo apt-get update && sudo apt-get install -y dos2unix
+          sudo apt-get update && sudo apt-get install -y dos2unix devscripts dh-python dput gnupg
           dos2unix build.sh src/main.py
           chmod +x build.sh
 
@@ -37,3 +37,7 @@ jobs:
         with:
           name: nark-browser-deb-arm64
           path: dist_deb/nark-browser_1.0.0_arm64.deb
+      
+      - name: Build Source Package & Upload
+        run: |
+          debuild -S -sa -us -uc
