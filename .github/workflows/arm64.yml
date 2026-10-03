@@ -22,7 +22,7 @@ jobs:
           dos2unix build.sh src/main.py
           chmod +x build.sh
 
-      - name: Build .deb inside Ubuntu arm64 Container
+      - name: Build Arm64 .deb
         run: |
           docker run --rm \
             --platform linux/arm64 \
@@ -31,7 +31,6 @@ jobs:
             arm64v8/ubuntu:22.04 \
             /bin/bash ./build.sh
 
-      # .deb ファイルをアップロード
       - name: Upload .deb Package
         uses: actions/upload-artifact@v4
         with:
