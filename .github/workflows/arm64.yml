@@ -3,21 +3,20 @@ name: Build Nark-Browser (arm64)
 on:
   push:
     branches: [ main ]
-
-permissions:
-  contents: write
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-arm64:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
+      - name: Set up QEMU (for arm64 emulation)
         uses: docker/setup-qemu-action@v3
 
-      - name: Fix line endings and permissions
+      - name: Convert line endings to LF
         run: |
           sudo apt-get update && sudo apt-get install -y dos2unix
           dos2unix build.sh src/main.py
@@ -32,17 +31,9 @@ jobs:
             arm64v8/ubuntu:22.04 \
             /bin/bash ./build.sh
 
-      - name: Generate APT Repository Index
-        run: |
-          sudo apt-get install -y dpkg-dev
-          mkdir -p public
-          cp dist_deb/*.deb public/
-          cd public
-          dpkg-scanpackages . /dev/null > Packages
-          gzip -k -f Packages
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      # .deb ファイルをアップロード
+      - name: Upload .deb Package
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          name: nark-browser-deb-arm64
+          path: dist_deb/nark-browser_1.0.0_arm64.deb
