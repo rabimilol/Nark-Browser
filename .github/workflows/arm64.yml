@@ -36,8 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nark-browser-deb-arm64
-          path: dist_deb/nark-browser_1.0.0_arm64.deb
-      
-      - name: Build Source Package & Upload
-        run: |
-          debuild -S -sa -us -uc
+          path: dist_deb/nark-browser_arm64.deb
